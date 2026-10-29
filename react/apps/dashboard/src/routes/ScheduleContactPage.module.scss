@@ -1,0 +1,254 @@
+@use "mixins" as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 60ch;
+}
+
+.title {
+  @include display(var(--text-2xl));
+
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.backLink {
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  &:hover {
+    color: var(--ink);
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 880px;
+}
+
+.section {
+  @include panel;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--rule);
+
+  &:disabled {
+    opacity: 0.55;
+  }
+}
+
+.sectionTitle {
+  @include label;
+
+  // Floated legends lose the native border-notch rendering, so the title sits inside the panel
+  // instead of straddling its rounded top edge.
+  float: left;
+  width: 100%;
+  padding: 0;
+}
+
+.sectionNote {
+  font-size: var(--text-sm);
+  color: var(--ink-3);
+}
+
+.fieldRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 180px;
+}
+
+.fieldLabel {
+  @include label;
+}
+
+.select,
+.input,
+.textarea {
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--ink);
+  background: var(--panel-sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.textarea {
+  font-family: var(--font-mono);
+  resize: vertical;
+}
+
+.typeToggle {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 34px;
+}
+
+.typeOption {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}
+
+.warning {
+  font-size: var(--text-sm);
+  color: var(--state-caution);
+}
+
+.retryInline {
+  padding: 0;
+  font-size: var(--text-sm);
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  background: var(--panel-sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+}
+
+.pickCell {
+  width: 32px;
+  text-align: center !important;
+}
+
+.clear {
+  color: var(--ink-3);
+}
+
+.conflict {
+  font-size: var(--text-xs);
+  color: var(--state-caution);
+}
+
+.configRow {
+  display: flex;
+  gap: var(--space-2);
+
+  .input:first-child {
+    font-family: var(--font-mono);
+    max-width: 200px;
+  }
+
+  .input:nth-child(2) {
+    flex: 1;
+  }
+}
+
+.rowButton {
+  font: inherit;
+  color: var(--ink-3);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0 var(--space-2);
+
+  &:hover:not(:disabled) {
+    color: var(--ink);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+}
+
+.addRow {
+  align-self: flex-start;
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  &:hover {
+    color: var(--ink);
+  }
+}
+
+.review {
+  @include tabular;
+
+  font-size: var(--text-sm);
+  color: var(--ink);
+  padding: var(--space-2) var(--space-3);
+  background: var(--panel-sunk);
+  border-left: 3px solid var(--state-nominal);
+  border-radius: var(--radius-sm);
+}
+
+.formFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.formError {
+  font-size: var(--text-xs);
+  color: var(--state-critical);
+}
+
+.submit {
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--panel);
+  background: var(--ink);
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.srOnly {
+  @include visually-hidden;
+}

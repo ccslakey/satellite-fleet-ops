@@ -1,0 +1,19 @@
+# version: "3.8"
+
+services:
+  fleet-ops:
+    image: fleet-ops/dev
+    container_name: fleet-ops-dev
+    ports:
+      - 3000:3000 # Server access port
+      - 8080:8080 # Dashboard access port
+      - 8081:8081 # Dashboard HMR port
+    volumes:
+      - ./:/workspace:delegated
+    working_dir: /workspace
+    command: '/bin/bash -c "trap : TERM INT; sleep infinity & wait"'
+
+networks:
+  default:
+    name: fleet-ops
+    external: true

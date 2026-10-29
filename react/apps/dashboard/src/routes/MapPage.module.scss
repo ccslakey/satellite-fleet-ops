@@ -1,0 +1,221 @@
+@use "mixins" as *;
+
+$states: nominal, planned, caution, critical, inert;
+
+@mixin state-color {
+  @each $state in $states {
+    &[data-state="#{$state}"] {
+      --state: var(--state-#{$state});
+    }
+  }
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 60ch;
+}
+
+.title {
+  @include display(var(--text-2xl));
+
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.panel {
+  @include panel;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4);
+}
+
+.map {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.sphere {
+  fill: var(--panel-sunk);
+  stroke: var(--rule-strong);
+}
+
+.graticule {
+  fill: none;
+  stroke: var(--rule);
+  stroke-width: 0.5;
+}
+
+.land {
+  fill: var(--rule);
+}
+
+.track {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 0.75;
+  stroke-opacity: 0.55;
+  stroke-dasharray: 4 3;
+  transition: stroke-opacity 120ms ease;
+}
+
+.map[data-highlighting] .track {
+  stroke-opacity: 0.12;
+}
+
+.map[data-highlighting] .track[data-active] {
+  stroke: var(--ink);
+  stroke-width: 1.4;
+  stroke-opacity: 0.95;
+  stroke-dasharray: none;
+}
+
+.footprint {
+  fill: var(--state, var(--state-inert));
+  fill-opacity: 0.05;
+  stroke: var(--state, var(--state-inert));
+  stroke-width: 0.75;
+  stroke-opacity: 0.45;
+
+  @include state-color;
+}
+
+.link path {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 1;
+  stroke-opacity: 0.7;
+}
+
+.station {
+  fill: var(--state, var(--state-inert));
+
+  @include state-color;
+}
+
+.satellite {
+  @include state-color;
+
+  circle {
+    fill: var(--state, var(--state-inert));
+    stroke: var(--panel);
+    stroke-width: 1;
+  }
+
+  &[data-degraded] circle {
+    fill: var(--panel);
+    stroke: var(--state, var(--state-inert));
+    stroke-dasharray: 2 1.5;
+  }
+
+  .hitArea {
+    pointer-events: all;
+    fill: none;
+    stroke: none;
+  }
+}
+
+.markerLabel {
+  @include tabular;
+
+  font-size: 10px;
+  fill: var(--ink-2);
+  paint-order: stroke;
+  stroke: var(--panel-sunk);
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  font-size: var(--text-xs);
+  color: var(--ink-2);
+}
+
+.legendItem {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.legendSatellite {
+  width: 8px;
+  height: 8px;
+  background: var(--ink-2);
+  border-radius: 50%;
+}
+
+.legendStation {
+  width: 7px;
+  height: 7px;
+  background: var(--ink-2);
+  transform: rotate(45deg);
+}
+
+.legendTrack {
+  width: 14px;
+  border-top: 1px dashed var(--ink-3);
+}
+
+.legendFootprint {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--ink-3);
+  border-radius: 50%;
+}
+
+.legendLink {
+  width: 14px;
+  border-top: 1px solid var(--ink-2);
+}
+
+.legendNote {
+  color: var(--ink-3);
+}
+
+.contacts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.contactsTitle {
+  @include label;
+}
+
+.contactsNote {
+  font-size: var(--text-sm);
+  color: var(--ink-3);
+}
+
+.tableWrap {
+  @include panel;
+
+  overflow-x: auto;
+}
+
+.rowName {
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 3px;
+
+  &:hover {
+    text-decoration-color: var(--ink);
+  }
+}

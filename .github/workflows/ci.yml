@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# The pnpm workspace lives in react/, not the repo root.
+defaults:
+  run:
+    working-directory: react
+
+jobs:
+  checks:
+    name: ${{ matrix.task }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # run every gate even if one fails, so a PR shows all problems at once
+      matrix:
+        task:
+          - test # vitest unit tests
+          - lint # eslint
+          - lint:styles # stylelint
+          - format:check # prettier
+          - type-check # tsc over dashboard src + tests + vite config, and server src
+          - build # tsc + vite production build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20" # engines pins >=20.10.0 <21
+          cache: pnpm
+          cache-dependency-path: react/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ${{ matrix.task }}
+        run: pnpm ${{ matrix.task }}
+
+  # Regenerates schema.graphql + src/gql from live introspection and fails on any diff, so a server
+  # shape change cannot compile green against stale committed types.
+  codegen-drift:
+    name: codegen-drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          cache-dependency-path: react/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and start the server
+        run: |
+          pnpm --filter @fleet-ops/server build
+          node apps/server/dist/index.js &
+          for i in $(seq 1 30); do
+            curl -sf -X POST http://localhost:3000/graphql -H 'content-type: application/json' -d '{"query":"{__typename}"}' && break
+            sleep 1
+          done
+
+      - name: Regenerate schema and types
+        run: pnpm --filter @fleet-ops/dashboard codegen:refresh
+
+      - name: Fail on drift
+        run: git diff --exit-code -- apps/dashboard/schema.graphql apps/dashboard/src/gql
